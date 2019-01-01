@@ -38,14 +38,37 @@ def forward_backward_prop(X, labels, params, dimensions):
     ofs += H * Dy
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
-    # Note: compute cost based on `sum` not `mean`.
-    ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
-    ### END YOUR CODE
+    # Forward propagation
+    N = X.shape[0]
 
-    ### YOUR CODE HERE: backward propagation
-    raise NotImplementedError
-    ### END YOUR CODE
+    a1 = X.dot(W1) + b1
+
+    s1 = sigmoid(a1)
+
+    a2 = s1.dot(W2) + b2
+
+    s2 = softmax(a2)
+
+    cost = -np.mean(np.log(s2[np.arange(N), np.argmax(labels, axis = 1)]))
+
+    #backpropagation
+
+    grad_for_a2 = s2
+
+    grad_for_a2[np.arange(N),np.argmax(labels,axis=1)] -= 1
+
+    grad_for_a2 /= N
+
+    gradW2 = s1.T.dot(grad_for_a2)
+
+    gradb2 = np.sum(grad_for_a2, axis=0, keepdims=True)
+
+    grad_for_s1 = grad_for_a2.dot(W2.T)
+    grad_for_a1 = grad_for_s1 * (1 - s1) * s1
+
+    gradW1 = X.T.dot(grad_for_a1)
+    gradb1 = np.sum(grad_for_a1,axis=0,keepdims=True)
+
 
     ### Stack gradients (do not modify)
     grad = np.concatenate((gradW1.flatten(), gradb1.flatten(),
@@ -90,4 +113,4 @@ def your_sanity_checks():
 
 if __name__ == "__main__":
     sanity_check()
-    your_sanity_checks()
+    # your_sanity_checks()
