@@ -102,30 +102,25 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
 
     # Sampling of indices is done for you. Do not modify this if you
     # wish to match the autograder and receive points!
-    cost = 0.0
-    grad = np.zeros_like(outputVectors)
-    gradPred = np.zeros_like(predicted)
-        
-    a_target = sigmoid(np.dot(predicted.reshape(-1), outputVectors[target].T))
-    cost += -np.log(a_target)                                # cost for target value
-    grad[target:target + 1] = (a_target - 1) * predicted        # gradient for target value
-    gradPred += (a_target - 1) * outputVectors[target]
-    
-    neg_samples = []  
-    
-    for i in range(K):
-        j = dataset.sampleTokenIdx()
-        if j == target or (j in neg_samples):
-            i -= 1           # if negative sample is same with target or already sampled, then resample.
-            continue
-        neg_samples.append(j)
-        
-        a_neg = sigmoid(-np.dot(predicted.reshape(-1), outputVectors[j].T))
-        cost += -np.log(a_neg)                                              # cost for negative sample
-        grad[j:j + 1] = (1 - a_neg) * predicted                                # gradient for negative sample
-        gradPred += (1 - a_neg) * outputVectors[j] 
-    
+    indices = [target]
+    indices.extend(getNegativeSamples(target, dataset, K))
 
+    grad = np.zeros(outputVectors.shape)
+    gradPred = np.zeros(predicted.shape)
+    cost = 0
+    z = sigmoid(np.dot(outputVectors[target], predicted))
+
+    cost -= np.log(z)
+    grad[target] += predicted * (z - 1.0)
+    gradPred += outputVectors[target] * (z - 1.0)
+
+    for k in range(K):
+        sample = indices[k + 1]
+        z = sigmoid(np.dot(outputVectors[sample], predicted))
+        cost -= np.log(1.0 - z)
+        grad[sample] += predicted * z
+        gradPred += outputVectors[sample] * z
+    
     return cost, gradPred, grad
 
 
@@ -158,7 +153,7 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     cword_idx = tokens[currentWord]
-    vhat = inputVectors[cword_idx]
+    vhat = inputVectors[cword_idx] # predicted
 
     for j in contextWords:
         u_idx = tokens[j]
@@ -189,7 +184,7 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # raise NotImplementedError
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -235,13 +230,13 @@ def test_word2vec():
     def getRandomContext(C):
         tokens = ["a", "b", "c", "d", "e"]
         return tokens[random.randint(0,4)], \
-            [tokens[random.randint(0,4)] for i in range(2*C)]
+            [tokens[random.randint(0,4)] for i in range(2 * C)]
     dataset.sampleTokenIdx = dummySampleTokenIdx
     dataset.getRandomContext = getRandomContext
 
     random.seed(31415)
     np.random.seed(9265)
-    dummy_vectors = normalizeRows(np.random.randn(10,3))
+    dummy_vectors = normalizeRows(np.random.randn(10, 3))
     dummy_tokens = dict([("a",0), ("b",1), ("c",2),("d",3),("e",4)])
     print("==== Gradient check for skip-gram ====")
     gradcheck_naive(lambda vec: word2vec_sgd_wrapper(
