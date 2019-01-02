@@ -40,7 +40,7 @@ wordVectors = sgd(
 # normalizing during training loses the notion of length.
 
 print("sanity check: cost at convergence should be around or below 10")
-print("training took %d seconds" % (time.time() - startTime))
+print(("training took %d seconds" % (time.time() - startTime)))
 
 # concatenate the input and output word vectors
 wordVectors = np.concatenate(
@@ -63,7 +63,7 @@ coord = temp.dot(U[:,0:2])
 
 for i in range(len(visualizeWords)):
     plt.text(coord[i,0], coord[i,1], visualizeWords[i],
-        bbox=dict(facecolor='green', alpha=0.1))
+        bbox = dict(facecolor='green', alpha=0.1))
 
 plt.xlim((np.min(coord[:,0]), np.max(coord[:,0])))
 plt.ylim((np.min(coord[:,1]), np.max(coord[:,1])))
