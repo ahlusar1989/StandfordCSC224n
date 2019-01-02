@@ -14,9 +14,7 @@ def sigmoid(x):
     s -- sigmoid(x)
     """
 
-    ### YOUR CODE HERE
     s = 1.0 / (1 + np.exp(-x))
-    ### END YOUR CODE
 
     return s
 
@@ -34,9 +32,7 @@ def sigmoid_grad(s):
     ds -- Your computed gradient.
     """
 
-    ### YOUR CODE HERE
     ds = s * (1 - s)
-    ### END YOUR CODE
 
     return ds
 
