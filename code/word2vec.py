@@ -55,7 +55,8 @@ def word2vec(dataset):
     nce_bias = tf.get_variable('nce_bias', initializer=tf.zeros([VOCAB_SIZE]))
 
     # define loss function to be NCE loss function
-    loss = tf.reduce_mean(tf.nn.nce_loss(weights=nce_weight, 
+    loss = tf.reduce_mean(tf.nn.nce_loss(
+                                        weights=nce_weight, 
                                         biases=nce_bias, 
                                         labels=target_words, 
                                         inputs=embed, 

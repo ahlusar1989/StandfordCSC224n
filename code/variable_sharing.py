@@ -34,21 +34,21 @@ def two_hidden_layers_2(x):
     logits = tf.matmul(h1, w2) + b2
     return logits
 
-# logits1 = two_hidden_layers(x1)
-# logits2 = two_hidden_layers(x2)
+logits1 = two_hidden_layers(x1)
+logits2 = two_hidden_layers(x2)
 
-# logits1 = two_hidden_layers_2(x1)
-# logits2 = two_hidden_layers_2(x2)
+logits1 = two_hidden_layers_2(x1)
+logits2 = two_hidden_layers_2(x2)
 
-# with tf.variable_scope('two_layers') as scope:
-#     logits1 = two_hidden_layers_2(x1)
-#     scope.reuse_variables()
-#     logits2 = two_hidden_layers_2(x2)
+with tf.variable_scope('two_layers') as scope:
+    logits1 = two_hidden_layers_2(x1)
+    scope.reuse_variables()
+    logits2 = two_hidden_layers_2(x2)
 
-# with tf.variable_scope('two_layers') as scope:
-#     logits1 = two_hidden_layers_2(x1)
-#     scope.reuse_variables()
-#     logits2 = two_hidden_layers_2(x2)
+with tf.variable_scope('two_layers') as scope:
+    logits1 = two_hidden_layers_2(x1)
+    scope.reuse_variables()
+    logits2 = two_hidden_layers_2(x2)
 
 def fully_connected(x, output_dim, scope):
     with tf.variable_scope(scope, reuse=tf.AUTO_REUSE) as scope:
@@ -62,7 +62,7 @@ def two_hidden_layers(x):
 
 with tf.variable_scope('two_layers') as scope:
     logits1 = two_hidden_layers(x1)
-    # scope.reuse_variables()
+    scope.reuse_variables()
     logits2 = two_hidden_layers(x2)
 
 writer = tf.summary.FileWriter('./graphs/cool_variables', tf.get_default_graph())
