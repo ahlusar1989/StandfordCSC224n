@@ -23,8 +23,13 @@ def softmax(x):
                   tensor in this problem.
     """
 
-    ### YOUR CODE HERE
-    ### END YOUR CODE
+    x = x - tf.expand_dims(tf.reduce_max(x, axis = 1), axis = 1)
+
+    exponentiate_x = tf.exp(x)
+
+    out = exponentiate_x / tf.expand_dims(
+        tf.reduce_sum(exponentiate_x, axis = 1), axis = 1
+        )
 
     return out
 
