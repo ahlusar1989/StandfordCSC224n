@@ -45,8 +45,15 @@ class SoftmaxModel(Model):
             self.input_placeholder
             self.labels_placeholder
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        config = self.config
+
+        self.input_placeholder = tf.placeholder(shape = (config.batch_size,
+                    config.n_features
+                ), dtype = tf.float32)
+
+        self.labels_placeholder = tf.placeholder(shape = (config.batch_size,
+                        config.n_classes
+                    ), dtype=tf.int32)
 
     def create_feed_dict(self, inputs_batch, labels_batch=None):
         """Creates the feed_dict for training the given step.
@@ -68,8 +75,12 @@ class SoftmaxModel(Model):
         Returns:
             feed_dict: The feed dictionary mapping from placeholders to values.
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+
+        feed_dict = {
+            self.input_placeholder : inputs_batch,
+            self.labels_placeholder : labels_batch
+        }
+
         return feed_dict
 
     def add_prediction_op(self):
@@ -89,9 +100,23 @@ class SoftmaxModel(Model):
         Returns:
             pred: A tensor of shape (batch_size, n_classes)
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
-        return pred
+        config = self.config
+
+        initializer = tf.truncated_normal(
+                   (config.n_features,
+                    config.n_classes),
+                    mean=0.0,
+                    stddev=1e-4,
+                    dtype=tf.float32,
+                    seed=2018
+                )
+
+        weights = tf.Variable(initializer, name = 'weights')
+
+        bias = tf.Variable(tf.zeros(config.n_classes), 
+            dtype = tf.float32, name = 'bias')
+
+        return softmax(tf.matmul(self.input_placeholder, weights) + bias)
 
     def add_loss_op(self, pred):
         """Adds cross_entropy_loss ops to the computational graph.
@@ -103,9 +128,7 @@ class SoftmaxModel(Model):
         Returns:
             loss: A 0-d tensor (scalar)
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
-        return loss
+        return cross_entropy_loss(self.labels_placeholder, pred)
 
     def add_training_op(self, loss):
         """Sets up the training Ops.
@@ -126,8 +149,9 @@ class SoftmaxModel(Model):
         Returns:
             train_op: The Op for training.
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+
+        train_op = tf.train.GradientDescentOptimizer(self.config.lr).minimize(loss)
+
         return train_op
 
     def run_epoch(self, sess, inputs, labels):
