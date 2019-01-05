@@ -58,10 +58,7 @@ def cross_entropy_loss(y, yhat):
                     tensor in the problem.
     """
 
-    ### YOUR CODE HERE
-    ### END YOUR CODE
-
-    return out
+    return -tf.reduce_sum(tf.multiply(tf.to_float(y), tf.log(yhat)))
 
 
 def test_softmax_basic():
