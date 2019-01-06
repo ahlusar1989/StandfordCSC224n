@@ -20,8 +20,11 @@ class PartialParse(object):
         # The sentence being parsed is kept for bookkeeping purposes. Do not use it in your code.
         self.sentence = sentence
 
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        self.stack = ['ROOT']
+
+        self.buffer = list(self.sentence)
+
+        self.dependencies = []
 
     def parse_step(self, transition):
         """Performs a single parse step by applying the given transition to this partial parse
@@ -31,8 +34,12 @@ class PartialParse(object):
                         and right-arc transitions. You can assume the provided transition is a legal
                         transition.
         """
-        ### YOUR CODE HERE
-        ### END YOUR CODE
+        if transition=='S':
+            self.stack.append(self.buffer.pop(0))
+        elif transition=='LA':
+            self.dependencies.append((self.stack[-1], self.stack.pop(-2)))
+        elif transition=='RA':
+            self.dependencies.append((self.stack[-2], self.stack.pop(-1)))
 
     def parse(self, transitions):
         """Applies the provided transitions to this PartialParse
@@ -65,8 +72,23 @@ def minibatch_parse(sentences, model, batch_size):
                       contain the parse for sentences[i]).
     """
 
-    ### YOUR CODE HERE
-    ### END YOUR CODE
+    partial_parses = [PartialParse(sentence) for sentence in sentences]
+    unfinished_parses = partial_parses
+
+
+    while(len(unfinished_parses) > 0):
+        
+        batch_parses = unfinished_parses[:batch_size]
+        transitions = model.predict(batch_parses)
+
+        for i in range(len(transitions)):
+            batch_parses[i].parse_step(transitions[i])
+            
+        unfinished_parses = [x for x in unfinished_parses 
+            if len(x.dependencies) < len(x.sentence)
+        ]
+
+    dependencies = [x.dependencies for x in partial_parses]
 
     return dependencies
 
