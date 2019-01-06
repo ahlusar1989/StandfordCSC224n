@@ -218,7 +218,7 @@ class ParserModel(Model):
             train_op: The Op for training.
         """
 
-        train_op = tf.train.AdamOptimizer().minimize(loss)
+        train_op = tf.train.AdamOptimizer(self.config.lr).minimize(loss)
 
         return train_op
 
