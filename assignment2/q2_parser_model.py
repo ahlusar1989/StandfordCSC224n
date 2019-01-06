@@ -87,11 +87,17 @@ class ParserModel(Model):
             feed_dict: The feed dictionary mapping from placeholders to values.
         """
 
-        feed_dict[self.input_placeholder] = inputs_batch
-        if labels_batch != None:
-            feed_dict[self.labels_placeholder] = labels_batch
-        if dropout != None:
-            feed_dict[self.dropout_placeholder] = dropout
+        if labels_batch is None:
+          feed_dict = {
+            self.input_placeholder: inputs_batch,
+            self.dropout_placeholder: dropout,
+          }
+        else:
+          feed_dict = {
+            self.input_placeholder: inputs_batch,
+            self.labels_placeholder: labels_batch,
+            self.dropout_placeholder: dropout,
+        }
         return feed_dict
 
     def add_embedding(self):
@@ -112,15 +118,9 @@ class ParserModel(Model):
             embeddings: tf.Tensor of shape (None, n_features*embed_size)
         """
 
-        embeddings = tf.nn.embedding_lookup(
-                self.pretrained_embeddings,
-                self.input_placeholder
-            )
-
-        embeddings = tf.reshape(
-            embeddings, [-1, self.config.n_features * self.config.embed_size]
-        )
-
+        embeddings = self.pretrained_embeddings
+        embeddings = tf.nn.embedding_lookup(embeddings, self.input_placeholder)
+        embeddings = tf.reshape(embeddings, (-1, self.config.n_features * self.config.embed_size))
 
         return embeddings
 
@@ -302,5 +302,5 @@ def main(debug=True):
 
 
 if __name__ == '__main__':
-    main()
+    main(debug=True)
 

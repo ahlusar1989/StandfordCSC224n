@@ -30,8 +30,8 @@ def xavier_weight_init():
         out = tf.random_uniform(
             shape, 
             minval = -epsilon,
-            maxval = epsilon, dtype = 
-            tf.float32
+            maxval = epsilon, 
+            dtype = tf.float32
         )
 
         return out
